@@ -1,0 +1,16 @@
+Braindamage - A Brainfuck interpreter written in Rust.
+
+
+More about Brainfuck can be read on its [wikipedia page](https://en.wikipedia.org/wiki/Brainfuck).
+The interpreter is the stock implementation of Brainfuck, meaning the buffer has a size of 30'000 and the type u8.
+Comments are allowed in form of any characters that are not keywords (> < + - . , [ ]).
+
+This project is split into two parts:
+ - The library that handles parsing and interpreting
+ - A small binary that provides a simple cli
+
+You can run the cli by running `cargo run --release -- --help` or by building the project with `cargo build --release` and executing the binary in `./target/release/braindamage-cli`.
+
+There are a couple of example brainfuck programs in the `examples` folder which you can run with `braindamage-cli -f examples/hello-world.b`.
+
+

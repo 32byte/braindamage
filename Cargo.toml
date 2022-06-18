@@ -1,0 +1,17 @@
+[package]
+name = "braindamage"
+version = "0.1.0"
+edition = "2021"
+authors = ["32byte"]
+description = "A brainfuck interpreter written in rust"
+
+[lib]
+name = "braindamage"
+path = "src/lib.rs"
+
+[[bin]]
+name = "braindamage-cli"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "3.2.5", features = ["derive"] }
