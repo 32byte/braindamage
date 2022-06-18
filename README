@@ -1,7 +1,7 @@
 Braindamage - A Brainfuck interpreter written in Rust.
 
 
-More about Brainfuck can be read on its [wikipedia page](https://en.wikipedia.org/wiki/Brainfuck).
+More about Brainfuck can be read on its wikipedia page: https://en.wikipedia.org/wiki/Brainfuck
 The interpreter is the stock implementation of Brainfuck, meaning the buffer has a size of 30'000 and the type u8.
 Comments are allowed in form of any characters that are not keywords (> < + - . , [ ]).
 
