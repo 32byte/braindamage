@@ -82,7 +82,7 @@ pub fn parse(str: &str) -> Result<Vec<Token>, ParseError> {
         }
     }
 
-    if stack.len() > 0 {
+    if !stack.is_empty() {
         return Err(ParseError::ExpectedClosingBracket(stack.len()));
     }
 
@@ -98,6 +98,12 @@ pub enum RuntimeError {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Buffer(pub [u8; BUF_SIZE]);
+
+impl Default for Buffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl Buffer {
     pub fn new() -> Self {
@@ -201,7 +207,7 @@ pub fn interpret(
     Ok(buf)
 }
 
-pub fn compile(tokens: &Vec<Token>) -> String {
+pub fn compile(tokens: &[Token]) -> String {
     let mut output = Vec::<String>::new();
 
     // NASM

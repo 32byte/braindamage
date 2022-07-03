@@ -5,7 +5,7 @@ use std::{
     process::{Command, Output, Stdio},
 };
 
-fn compile_program(tokens: &Vec<Token>, name: &str, stdin: &mut impl Read) -> Output {
+fn compile_program(tokens: &[Token], name: &str, stdin: &mut impl Read) -> Output {
     // compile and run the program
     let asm = braindamage::compile(tokens);
     // write assembly to file
@@ -41,10 +41,11 @@ fn compile_program(tokens: &Vec<Token>, name: &str, stdin: &mut impl Read) -> Ou
     // need to create temporary buffer (i think?)
     let buf: Result<Vec<u8>, _> = stdin.bytes().collect();
     // forward input to the program
-    let child_stdin = child.stdin.as_mut().unwrap();
-    child_stdin.write_all(&buf.unwrap()).unwrap();
+    {
+        let child_stdin = child.stdin.as_mut().unwrap();
+        child_stdin.write_all(&buf.unwrap()).unwrap();
+    }
     // close child stdin
-    drop(child_stdin);
     child.wait_with_output().unwrap()
 }
 

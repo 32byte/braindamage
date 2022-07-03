@@ -32,7 +32,7 @@ fn main() {
     let args = Args::parse();
 
     let content = if let Some(path) = args.file {
-        fs::read_to_string(&path).expect(&format!("Couldn't read {}", path))
+        fs::read_to_string(&path).unwrap_or_else(|_| panic!("Couldn't read {}", path))
     } else {
         // Safe to unwrap since clap makes sure that either `file` or `program` is some.
         args.program.unwrap()
@@ -49,7 +49,7 @@ fn main() {
     };
 
     if args.compile {
-        let binary_name = args.output.unwrap_or("program.out".to_string());
+        let binary_name = args.output.unwrap_or_else(|| "program.out".to_string());
 
         // compile and run the program
         let asm = braindamage::compile(&tokens);
@@ -74,7 +74,7 @@ fn main() {
         // link the program
         Command::new("ld")
             .args([&format!("./build/{binary_name}.o")])
-            .args(["-o", &format!("{binary_name}")])
+            .args(["-o", &binary_name])
             .spawn()
             .unwrap()
             .wait()
