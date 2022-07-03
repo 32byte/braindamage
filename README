@@ -14,3 +14,9 @@ You can run the cli by running `cargo run --release -- --help` or by building th
 There are a couple of example brainfuck programs in the `examples` folder which you can run with `braindamage-cli -f examples/hello-world.b`.
 
 
+
+Compiling brainfuck to native code is now also supported with the help of `nasm`. The program will generate an assembly file, compile it using `nasm` and link it using `ld`. This process was only tested on linux.
+If you would like to compile a brainfuck program run the following command: `braindamage-cli -f path/to/file.b -c -o program.out`.
+Requirements for this process are: 
+ - Have `nasm` in your path
+ - Have `ld` in your path
