@@ -92,6 +92,7 @@ pub fn parse(str: &str) -> Result<Vec<Token>, ParseError> {
 #[derive(Debug, PartialEq, Eq)]
 pub enum RuntimeError {
     PtrOutOfBounds(i32),
+    OutOfInput,
     IOError,
 }
 
@@ -167,12 +168,14 @@ pub fn interpret(
                 }
             }
             Token::ReadByte => {
-                let input = input.bytes().next().unwrap().unwrap();
-
-                if let Some(byte) = buf.get_mut_checked(ptr) {
-                    *byte = input;
+                if let Some(char) = input.bytes().next() {
+                    if let Some(byte) = buf.get_mut_checked(ptr) {
+                        *byte = char.map_err(|_| RuntimeError::IOError)?;
+                    } else {
+                        return Err(RuntimeError::PtrOutOfBounds(ptr));
+                    }
                 } else {
-                    return Err(RuntimeError::PtrOutOfBounds(ptr));
+                    return Err(RuntimeError::OutOfInput);
                 }
             }
             Token::LoopStart(end) => {
@@ -196,4 +199,42 @@ pub fn interpret(
     }
 
     Ok(buf)
+}
+
+pub fn compile(tokens: &Vec<Token>) -> String {
+    let mut output = Vec::<String>::new();
+
+    // NASM
+    // Boilerplate for the assembly
+    let boilerplate: Vec<String> = include_str!("./boilerplate.asm")
+        .lines()
+        .map(|s| s.to_owned())
+        .collect();
+    output.extend(boilerplate);
+
+    for (idx, token) in tokens.iter().enumerate() {
+        match token {
+            Token::IncPtr => output.push("\tadd qword r12, 1".to_owned()),
+            Token::DecPtr => output.push("\tsub qword r12, 1".to_owned()),
+            Token::IncByte => output.push("\tadd byte [r12], 1".to_owned()),
+            Token::DecByte => output.push("\tsub byte [r12], 1".to_owned()),
+            Token::WriteByte => output.push("\tcall writec".to_owned()),
+            Token::ReadByte => output.push("\tcall readc".to_owned()),
+            Token::LoopStart(end) => {
+                // jump to end if r12 is 0
+                output.push("\tcmp byte [r12], 0".to_owned());
+                output.push(format!("\tje LOOP_END_{}", end));
+
+                output.push(format!("LOOP_START_{}:", idx));
+            }
+            Token::LoopEnd(start) => {
+                output.push("\tcmp byte [r12], 0".to_owned());
+                output.push(format!("\tjne LOOP_START_{}", start));
+                output.push(format!("LOOP_END_{}:", idx));
+            }
+        };
+    }
+    output.push("\tcall exit".to_owned());
+
+    output.join("\n")
 }
